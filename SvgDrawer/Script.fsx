@@ -25,5 +25,5 @@ model
 |> Action.RMove(-1, 0).On
 |> Rectangle.On
 |> Attr.FillColor("White").With
-|> SvgHelper.draw @"C:\Users\So\Documents\Programs\fsharp\projects\SvgDrawer\SvgDrawer\bin\Debug\test.svg"
+|> SvgHelper.draw @"C:\test.svg"
 
