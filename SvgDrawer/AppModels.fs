@@ -29,7 +29,7 @@ and Attr =
     | Width       of int 
     | Height      of int 
     | Radius      of int 
-    | LineWidth   of float 
+    | StrokeWidth of float 
     | StrokeColor of string 
     | FillColor   of string 
     with 
@@ -43,13 +43,13 @@ and Attr =
 and Line =
     { Start       : float * float
       End         : float * float
-      LineWidth   : float
+      StrokeWidth : float
       StrokeColor : Color }
     with 
     static member Default () = 
         { Start       = (0.0, 0.0)
           End         = (0.0, 0.0)
-          LineWidth   = 1.0
+          StrokeWidth = 1.0
           StrokeColor = Color.Black }
     static member To (x, y) (model : Model) = 
         let blockSize = model.BlockSize
@@ -63,20 +63,20 @@ and Line =
 
     member __.Attr (attr : Attr) (model : Model) : Line = 
         match attr with
-        | LineWidth (width) -> { __ with LineWidth = width } 
+        | StrokeWidth (width) -> { __ with StrokeWidth = width } 
         | _                 -> __
         
 
 and Circle = 
     { Position    : float * float
       R           : float 
-      LineWidth   : float
+      StrokeWidth : float
       StrokeColor : Color 
       FillColor   : Color }
     static member Default () = 
         { Position    = (0.0, 0.0)
           R           = 10.0
-          LineWidth   = 1.0
+          StrokeWidth = 1.0
           StrokeColor = Color.Black 
           FillColor   = Color.White }
     static member On (model : Model) = 
@@ -92,7 +92,7 @@ and Circle =
         | Width     (width)   -> { __ with R = float width  * blockSize }
         | Height    (height)  -> { __ with R = float height * blockSize } 
         | Radius    (radius)  -> { __ with R = float radius * blockSize }  
-        | LineWidth (width)   -> { __ with LineWidth = width } 
+        | StrokeWidth (width) -> { __ with StrokeWidth = width } 
         | StrokeColor (color) -> { __ with StrokeColor = Color.FromName (color) } 
         | FillColor (color)   -> { __ with FillColor = Color.FromName (color) } 
         | _                   -> __
@@ -101,7 +101,7 @@ and Rectangle =
     { Position    : float * float 
       W           : float 
       H           : float  
-      LineWidth   : float
+      StrokeWidth : float
       StrokeColor : Color 
       FillColor   : Color }
     
@@ -109,7 +109,7 @@ and Rectangle =
         { Position    = (0.0, 0.0)
           W           = 10.0
           H           = 10.0
-          LineWidth   = 1.0
+          StrokeWidth = 1.0
           StrokeColor = Color.Black 
           FillColor   = Color.White }
     static member On (model : Model) = 
@@ -124,7 +124,7 @@ and Rectangle =
         match attr with
         | Width     (width)   -> { __ with W = float width  * blockSize }
         | Height    (height)  -> { __ with H = float height * blockSize } 
-        | LineWidth (width)   -> { __ with LineWidth = width } 
+        | StrokeWidth (width) -> { __ with StrokeWidth = width } 
         | StrokeColor (color) -> { __ with StrokeColor = Color.FromName (color) } 
         | FillColor (color)   -> { __ with FillColor = Color.FromName (color) } 
         | _                   -> __
