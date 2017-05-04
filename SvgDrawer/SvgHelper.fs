@@ -2,9 +2,17 @@
 
 module SvgHelper =
 
+    open System.Windows
     open Svg
 
+    let typeFaceBase = new Media.Typeface("ＭＳ Ｐゴシック");
+
     let number x = new SvgUnit (float32 x)
+
+    let numberCollection (xs : float array) = 
+        let collection = new SvgUnitCollection ()
+        xs |> Array.iter (fun x -> collection.Add (number x))    
+        collection        
 
     let color (color : Color) = 
         new SvgColourServer (System.Drawing.Color.FromArgb (color.R, color.G, color.B)) 
@@ -43,6 +51,33 @@ module SvgHelper =
             svgRectangle.Stroke      <- color (rectangle.StrokeColor)
             svgRectangle.Fill        <- color (rectangle.FillColor)
             doc.Children.Add (svgRectangle)
+        | Text (text) -> 
+            let (x, y)  = text.Position
+            let svgText = new SvgText ()
+            let (offsetX, offsetY) = text.Offset
+            let (sign, anchor) =
+                if      0 < offsetX then ( 1.0, SvgTextAnchor.Start) 
+                else if 0 > offsetX then (-1.0, SvgTextAnchor.End)
+                else                     ( 1.0, SvgTextAnchor.Middle)
+            let font  = 
+                new Media.FormattedText (text.Content, 
+                                         System.Globalization.CultureInfo.CurrentCulture,
+                                         FlowDirection.LeftToRight,
+                                         typeFaceBase,
+                                         text.FontSize,
+                                         Media.Brushes.Transparent)
+            let textW = font.Width
+            let textH = font.Height
+            let textX = x - sign * (0.5 * textW) + float offsetX * textW     
+            let textY = y - (0.5 * textH) + float offsetY * textH     
+            svgText.X          <- numberCollection [| textX |]
+            svgText.Y          <- numberCollection [| textY |]
+            svgText.Content    <- text.Content
+            svgText.FontSize   <- number text.FontSize
+            svgText.TextAnchor <- anchor
+            svgText.Color      <- color (text.Color)
+            svgText.Fill       <- color (text.Color)
+
          
     let draw (path : string) (model : Model) = 
         let doc = new SvgDocument ()

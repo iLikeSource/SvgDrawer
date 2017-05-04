@@ -13,6 +13,8 @@ type Color =
         | "white" -> Color.White 
         | _       -> failwith "未実装" 
 
+
+
 type Action = 
     | Move  of int * int 
     | RMove of int * int 
@@ -32,6 +34,7 @@ and Attr =
     | StrokeWidth of float 
     | StrokeColor of string 
     | FillColor   of string 
+    | FontSize    of float 
     with 
     member __.With (model : Model) = 
         match model.Shapes with
@@ -73,6 +76,7 @@ and Circle =
       StrokeWidth : float
       StrokeColor : Color 
       FillColor   : Color }
+    with 
     static member Default () = 
         { Position    = (0.0, 0.0)
           R           = 10.0
@@ -103,8 +107,8 @@ and Rectangle =
       H           : float  
       StrokeWidth : float
       StrokeColor : Color 
-      FillColor   : Color }
-    
+      FillColor   : Color } 
+    with 
     static member Default () = 
         { Position    = (0.0, 0.0)
           W           = 10.0
@@ -128,11 +132,48 @@ and Rectangle =
         | StrokeColor (color) -> { __ with StrokeColor = Color.FromName (color) } 
         | FillColor (color)   -> { __ with FillColor = Color.FromName (color) } 
         | _                   -> __
+
+and Text = 
+    { Position : float * float 
+      Offset   : int * int
+      Content  : string 
+      Color    : Color
+      FontSize : float }
+    with
+    static member Default () = 
+        { Position = (0.0, 0.0) 
+          Offset   = (0, 0)
+          Content  = "" 
+          Color    = Color.Black
+          FontSize = 8.0 }
+    static member On (model : Model) = 
+        let blockSize = model.BlockSize
+        let (x, y) = model.Position
+        let shape =
+            { Text.Default () with Position = (float (x - 1) * blockSize, float (y - 1) * blockSize) }
+        { model with  Shapes = Text (shape) :: model.Shapes }
     
+    static member At (offsetX : int, offsetY : int) (model : Model) = 
+        let blockSize = model.BlockSize
+        let (x, y) = model.Position
+        let shape =
+            { Text.Default () with Position = (float (x - 1) * blockSize, float (y - 1) * blockSize) 
+                                   Offset   = (offsetX, offsetY) }
+        { model with  Shapes = Text (shape) :: model.Shapes }
+
+    member __.Attr (attr : Attr) (model : Model) : Text =
+        let blockSize = model.BlockSize 
+        match attr with
+        | StrokeColor (color) -> { __ with Color = Color.FromName (color) } 
+        | FontSize    (size)  -> { __ with FontSize = size } 
+        | _                   -> __
+
+
 and Shape = 
     | Line      of Line
     | Rectangle of Rectangle
     | Circle    of Circle
+    | Text      of Text
 
 
 and Model = 
