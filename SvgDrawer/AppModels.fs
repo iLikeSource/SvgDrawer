@@ -38,10 +38,11 @@ and Attr =
     with 
     member __.With (model : Model) = 
         match model.Shapes with
-        | Line (line)           :: tl -> { model with Shapes = Line      (line.Attr      __ model) :: tl } 
-        | Circle (circle)       :: tl -> { model with Shapes = Circle    (circle.Attr    __ model) :: tl }  
+        | Line      (line)      :: tl -> { model with Shapes = Line      (line.Attr      __ model) :: tl } 
+        | Circle    (circle)    :: tl -> { model with Shapes = Circle    (circle.Attr    __ model) :: tl }  
         | Rectangle (rectangle) :: tl -> { model with Shapes = Rectangle (rectangle.Attr __ model) :: tl }  
-        | _ -> failwith "想定外"
+        | Text      (text)      :: tl -> { model with Shapes = Text      (text.Attr      __ model) :: tl }   
+        | [] -> model
 
 and Line =
     { Start       : float * float
@@ -146,19 +147,21 @@ and Text =
           Content  = "" 
           Color    = Color.Black
           FontSize = 8.0 }
-    static member On (model : Model) = 
-        let blockSize = model.BlockSize
-        let (x, y) = model.Position
-        let shape =
-            { Text.Default () with Position = (float (x - 1) * blockSize, float (y - 1) * blockSize) }
-        { model with  Shapes = Text (shape) :: model.Shapes }
-    
-    static member At (offsetX : int, offsetY : int) (model : Model) = 
+    static member On (content : string) (model : Model) = 
         let blockSize = model.BlockSize
         let (x, y) = model.Position
         let shape =
             { Text.Default () with Position = (float (x - 1) * blockSize, float (y - 1) * blockSize) 
-                                   Offset   = (offsetX, offsetY) }
+                                   Content  = content }
+        { model with  Shapes = Text (shape) :: model.Shapes }
+    
+    static member At (content : string, offsetX : int, offsetY : int) (model : Model) = 
+        let blockSize = model.BlockSize
+        let (x, y) = model.Position
+        let shape =
+            { Text.Default () with Position = (float (x - 1) * blockSize, float (y - 1) * blockSize) 
+                                   Offset   = (offsetX, offsetY) 
+                                   Content  = content }
         { model with  Shapes = Text (shape) :: model.Shapes }
 
     member __.Attr (attr : Attr) (model : Model) : Text =

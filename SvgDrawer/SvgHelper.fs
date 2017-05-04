@@ -5,6 +5,8 @@ module SvgHelper =
     open System.Windows
     open Svg
 
+    let margin = 20.0
+
     let typeFaceBase = new Media.Typeface("ＭＳ Ｐゴシック");
 
     let number x = new SvgUnit (float32 x)
@@ -23,18 +25,18 @@ module SvgHelper =
             let (x0, y0) = line.Start
             let (x1, y1) = line.End
             let svgLine = new SvgLine ()
-            svgLine.StartX      <- number x0
-            svgLine.StartY      <- number y0
-            svgLine.EndX        <- number x1
-            svgLine.EndY        <- number y1
+            svgLine.StartX      <- number (margin + x0)
+            svgLine.StartY      <- number (margin + y0)
+            svgLine.EndX        <- number (margin + x1)
+            svgLine.EndY        <- number (margin + y1)
             svgLine.StrokeWidth <- number (line.StrokeWidth)
             svgLine.Stroke      <- color (line.StrokeColor)
             doc.Children.Add (svgLine)
         | Circle (circle) ->
             let (x, y) = circle.Position
             let svgCircle = new SvgCircle ()
-            svgCircle.CenterX     <- number x
-            svgCircle.CenterY     <- number y
+            svgCircle.CenterX     <- number (margin + x)
+            svgCircle.CenterY     <- number (margin + y)
             svgCircle.Radius      <- number circle.R
             svgCircle.StrokeWidth <- number (circle.StrokeWidth)
             svgCircle.Stroke      <- color (circle.StrokeColor)
@@ -43,8 +45,8 @@ module SvgHelper =
         | Rectangle (rectangle) ->
             let (x, y) = rectangle.Position
             let svgRectangle = new SvgRectangle ()
-            svgRectangle.X           <- number (x - 0.5 * rectangle.W)
-            svgRectangle.Y           <- number (y - 0.5 * rectangle.H)
+            svgRectangle.X           <- number (margin + x - 0.5 * rectangle.W)
+            svgRectangle.Y           <- number (margin + y - 0.5 * rectangle.H)
             svgRectangle.Width       <- number rectangle.W
             svgRectangle.Height      <- number rectangle.H
             svgRectangle.StrokeWidth <- number (rectangle.StrokeWidth)
@@ -68,8 +70,8 @@ module SvgHelper =
                                          Media.Brushes.Transparent)
             let textW = font.Width
             let textH = font.Height
-            let textX = x - sign * (0.5 * textW) + float offsetX * textW     
-            let textY = y - (0.5 * textH) + float offsetY * textH     
+            let textX = margin + x - sign * (0.5 * textW) + float offsetX * textW     
+            let textY = margin + y - (0.5 * textH) + float offsetY * textH     
             svgText.X          <- numberCollection [| textX |]
             svgText.Y          <- numberCollection [| textY |]
             svgText.Content    <- text.Content
@@ -77,12 +79,14 @@ module SvgHelper =
             svgText.TextAnchor <- anchor
             svgText.Color      <- color (text.Color)
             svgText.Fill       <- color (text.Color)
+            svgText.Nodes.Add (new SvgContentNode (Content = text.Content))
+            doc.Children.Add (svgText)
 
          
     let draw (path : string) (model : Model) = 
         let doc = new SvgDocument ()
-        doc.Width  <- number (model.BlockSize * float model.RowCount)        
-        doc.Height <- number (model.BlockSize * float model.ColumnCount)
+        doc.Width  <- number (margin + model.BlockSize * float model.ColumnCount)        
+        doc.Height <- number (margin + model.BlockSize * float model.RowCount)
         model.Shapes
         |> List.rev
         |> List.iter (drawShape doc)
