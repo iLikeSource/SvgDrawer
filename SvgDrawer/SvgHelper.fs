@@ -82,16 +82,22 @@ module SvgHelper =
             svgText.Nodes.Add (new SvgContentNode (Content = text.Content))
             doc.Children.Add (svgText)
 
-         
-    let draw (path : string) (model : Model) = 
+    let build (model : Model) = 
         let doc = new SvgDocument ()
         doc.Width  <- number (margin + model.BlockSize * float model.ColumnCount)        
         doc.Height <- number (margin + model.BlockSize * float model.RowCount)
         model.Shapes
         |> List.rev
         |> List.iter (drawShape doc)
+        doc
+         
+    let draw (path : string) (model : Model) = 
+        let doc = build (model) 
         doc.Write (path)
-
+    
+    let save (path : string) (model : Model) = 
+        let doc = build (model) 
+        doc.Draw().Save(path)
 
                 
 

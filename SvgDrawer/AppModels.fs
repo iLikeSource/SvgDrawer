@@ -28,9 +28,9 @@ type Action =
             { model with Position = (x0 + x, y0 + y) } 
 
 and Attr =
-    | Width       of int 
-    | Height      of int 
-    | Radius      of int 
+    | Width       of float 
+    | Height      of float 
+    | Radius      of float 
     | StrokeWidth of float 
     | StrokeColor of string 
     | FillColor   of string 
@@ -94,13 +94,13 @@ and Circle =
     member __.Attr (attr : Attr) (model : Model) : Circle =
         let blockSize = model.BlockSize 
         match attr with
-        | Width     (width)   -> { __ with R = float width  * blockSize }
-        | Height    (height)  -> { __ with R = float height * blockSize } 
-        | Radius    (radius)  -> { __ with R = float radius * blockSize }  
-        | StrokeWidth (width) -> { __ with StrokeWidth = width } 
-        | StrokeColor (color) -> { __ with StrokeColor = Color.FromName (color) } 
-        | FillColor (color)   -> { __ with FillColor = Color.FromName (color) } 
-        | _                   -> __
+        | Width       (width)  -> { __ with R = width  * blockSize }
+        | Height      (height) -> { __ with R = height * blockSize } 
+        | Radius      (radius) -> { __ with R = radius * blockSize }  
+        | StrokeWidth (width)  -> { __ with StrokeWidth = width } 
+        | StrokeColor (color)  -> { __ with StrokeColor = Color.FromName (color) } 
+        | FillColor   (color)  -> { __ with FillColor = Color.FromName (color) } 
+        | _                    -> __
 
 and Rectangle = 
     { Position    : float * float 
@@ -127,8 +127,8 @@ and Rectangle =
     member __.Attr (attr : Attr) (model : Model) : Rectangle =
         let blockSize = model.BlockSize 
         match attr with
-        | Width     (width)   -> { __ with W = float width  * blockSize }
-        | Height    (height)  -> { __ with H = float height * blockSize } 
+        | Width     (width)   -> { __ with W = width  * blockSize }
+        | Height    (height)  -> { __ with H = height * blockSize } 
         | StrokeWidth (width) -> { __ with StrokeWidth = width } 
         | StrokeColor (color) -> { __ with StrokeColor = Color.FromName (color) } 
         | FillColor (color)   -> { __ with FillColor = Color.FromName (color) } 
