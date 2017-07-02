@@ -47,6 +47,8 @@
     <Compile Include="AssemblyInfo.fs" />
     <None Include="Script.fsx" />
     <None Include="Otm.fsx" />
+    <None Include="RigidZone.fsx" />
+    <None Include="InflectionPoint.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SvgDrawer\SvgDrawer.fsproj">

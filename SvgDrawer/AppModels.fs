@@ -7,10 +7,18 @@ type Color =
     with 
     static member Black = { R =   0; G =   0; B =   0 }
     static member White = { R = 255; G = 255; B = 255 }
+    static member Gray  = { R = 204; G = 204; B = 204 }
+    static member Red   = { R = 255; G =   0; B =   0 }
+    static member Green = { R =   0; G = 255; B =   0 }
+    static member Blue  = { R =   0; G =   0; B = 255 }
     static member FromName (s : string) : Color =
         match s.ToLower () with
         | "black" -> Color.Black 
         | "white" -> Color.White 
+        | "gray"  -> Color.Gray 
+        | "blue"  -> Color.Blue 
+        | "red"   -> Color.Red 
+        | "green" -> Color.Green 
         | _       -> failwith "未実装" 
 
 
@@ -43,6 +51,11 @@ and Attr =
         | Rectangle (rectangle) :: tl -> { model with Shapes = Rectangle (rectangle.Attr __ model) :: tl }  
         | Text      (text)      :: tl -> { model with Shapes = Text      (text.Attr      __ model) :: tl }   
         | [] -> model
+    
+    member __.WithDefault (model : Model) = 
+        match __ with
+        | StrokeColor (color) -> { model with StrokeColor = Color.FromName color }
+        | _                   -> model
 
 and Line =
     { Start       : float * float
@@ -60,14 +73,16 @@ and Line =
         let (startX, startY) = model.Position
         let (endX  , endY  ) = (x, y)
         let shape =
-            { Line.Default () with Start = (float (startX - 1) * blockSize, float (startY - 1) * blockSize) 
-                                   End   = (float (endX   - 1) * blockSize, float (endY   - 1) * blockSize) }
+            { Line.Default () with Start       = (float (startX - 1) * blockSize, float (startY - 1) * blockSize) 
+                                   End         = (float (endX   - 1) * blockSize, float (endY   - 1) * blockSize) 
+                                   StrokeColor = model.StrokeColor  }
         { model with Position = (x, y)
                      Shapes   = Line (shape) :: model.Shapes }
 
     member __.Attr (attr : Attr) (model : Model) : Line = 
         match attr with
         | StrokeWidth (width) -> { __ with StrokeWidth = width } 
+        | StrokeColor (color) -> { __ with StrokeColor = Color.FromName color } 
         | _                 -> __
         
 
@@ -88,7 +103,8 @@ and Circle =
         let blockSize = model.BlockSize
         let (x, y) = model.Position
         let shape =
-            { Circle.Default () with Position = (float (x - 1) * blockSize, float (y - 1) * blockSize) }
+            { Circle.Default () with Position    = (float (x - 1) * blockSize, float (y - 1) * blockSize)  
+                                     StrokeColor = model.StrokeColor }
         { model with  Shapes = Circle (shape) :: model.Shapes }
 
     member __.Attr (attr : Attr) (model : Model) : Circle =
@@ -121,7 +137,8 @@ and Rectangle =
         let blockSize = model.BlockSize
         let (x, y) = model.Position
         let shape =
-            { Rectangle.Default () with Position = (float (x - 1) * blockSize, float (y - 1) * blockSize) }
+            { Rectangle.Default () with Position    = (float (x - 1) * blockSize, float (y - 1) * blockSize) 
+                                        StrokeColor = model.StrokeColor }
         { model with  Shapes = Rectangle (shape) :: model.Shapes }
 
     member __.Attr (attr : Attr) (model : Model) : Rectangle =
@@ -159,7 +176,7 @@ and Text =
         let blockSize = model.BlockSize
         let (x, y) = model.Position
         let shape =
-            { Text.Default () with Position = (float (x - 1) * blockSize, float (y - 1) * blockSize) 
+            { Text.Default () with Position = (float (x) * blockSize, float (y) * blockSize) 
                                    Offset   = (offsetX, offsetY) 
                                    Content  = content }
         { model with  Shapes = Text (shape) :: model.Shapes }
@@ -184,8 +201,10 @@ and Model =
       RowCount    : int 
       ColumnCount : int
       Position    : int * int
+      StrokeColor : Color
       Shapes      : Shape list }
     with 
     member __.Shape = List.head __.Shapes
+
 
 
