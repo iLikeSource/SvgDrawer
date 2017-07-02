@@ -12,7 +12,7 @@ open KTB
 
 let model : SvgDrawer.Model = 
     { BlockSize   = 10.0 
-      RowCount    = 20 
+      RowCount    = 10 
       ColumnCount = 20
       Position    = (0, 0) 
       StrokeColor = Color.Black
@@ -20,20 +20,26 @@ let model : SvgDrawer.Model =
 
 let draw () = 
     model
-    |> Action.Move(6, 10).On
-    |> Line.To(6, 16)
+    |> Action.Move(6, 2).On
+    |> Line.To(6, 8)
     |> Attr.StrokeWidth(3.0).With
     |> Attr.StrokeColor("blue").WithDefault
-    |> Line.To(4, 16)
-    |> Line.To(6, 10)
-    |> Action.Move(16, 10).On
+    |> Line.To(2, 8)
+    |> Line.To(6, 2)
+    |> Action.Move(16, 2).On
     |> Attr.StrokeColor("black").WithDefault
-    |> Line.To(16, 16)
+    |> Line.To(16, 8)
     |> Attr.StrokeWidth(3.0).With
     |> Attr.StrokeColor("blue").WithDefault
-    |> Line.To(15, 16)
-    |> Line.To(17, 10)
-    |> Line.To(16, 10)
+    |> Line.To(14, 8)
+    |> Line.To(18, 2)
+    |> Line.To(16, 2)
+    |> Action.Move(6, 8).On
+    |> Text.At ("片持柱", 0, 1)
+    |> Attr.FontSize(10.0).With
+    |> Action.Move(16, 8).On
+    |> Text.At ("逆対称", 0, 1)
+    |> Attr.FontSize(10.0).With
     |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\InflectionPoint.bmp"
 
            
