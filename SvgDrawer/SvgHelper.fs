@@ -7,7 +7,7 @@ module SvgHelper =
 
     let margin = 20.0
 
-    let typeFaceBase = new Media.Typeface("ＭＳ Ｐゴシック");
+    let typeFaceBase = new Media.Typeface("ＭＳ ゴシック");
 
     let number x = new SvgUnit (float32 x)
 
@@ -45,6 +45,7 @@ module SvgHelper =
         | Rectangle (rectangle) ->
             let (x, y) = rectangle.Position
             let svgRectangle = new SvgRectangle ()
+            let path = new SvgPath ()
             svgRectangle.X           <- number (margin + x - 0.5 * rectangle.W)
             svgRectangle.Y           <- number (margin + y - 0.5 * rectangle.H)
             svgRectangle.Width       <- number rectangle.W
@@ -81,7 +82,14 @@ module SvgHelper =
             svgText.Fill       <- color (text.Color)
             svgText.Nodes.Add (new SvgContentNode (Content = text.Content))
             doc.Children.Add (svgText)
-
+        | Path (path) ->
+            let svgPath = new SvgPath ()
+            svgPath.PathData    <- SvgPathBuilder.Parse(path.Data)
+            svgPath.StrokeWidth <- number (path.StrokeWidth)
+            svgPath.Stroke      <- color (path.StrokeColor)
+            svgPath.Fill        <- color (path.FillColor)
+            doc.Children.Add (svgPath)
+            
     let build (model : Model) = 
         let doc = new SvgDocument ()
         doc.Width  <- number (margin + model.BlockSize * float model.ColumnCount)        

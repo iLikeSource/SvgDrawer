@@ -49,6 +49,7 @@
     <None Include="Otm.fsx" />
     <None Include="RigidZone.fsx" />
     <None Include="InflectionPoint.fsx" />
+    <None Include="CMoQ.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SvgDrawer\SvgDrawer.fsproj">

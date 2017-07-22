@@ -55,6 +55,7 @@ and Attr =
     member __.WithDefault (model : Model) = 
         match __ with
         | StrokeColor (color) -> { model with StrokeColor = Color.FromName color }
+        | StrokeWidth (width) -> { model with StrokeWidth = width }
         | _                   -> model
 
 and Line =
@@ -75,7 +76,8 @@ and Line =
         let shape =
             { Line.Default () with Start       = (float (startX - 1) * blockSize, float (startY - 1) * blockSize) 
                                    End         = (float (endX   - 1) * blockSize, float (endY   - 1) * blockSize) 
-                                   StrokeColor = model.StrokeColor  }
+                                   StrokeColor = model.StrokeColor 
+                                   StrokeWidth = model.StrokeWidth  }
         { model with Position = (x, y)
                      Shapes   = Line (shape) :: model.Shapes }
 
@@ -104,7 +106,8 @@ and Circle =
         let (x, y) = model.Position
         let shape =
             { Circle.Default () with Position    = (float (x - 1) * blockSize, float (y - 1) * blockSize)  
-                                     StrokeColor = model.StrokeColor }
+                                     StrokeColor = model.StrokeColor 
+                                     StrokeWidth = model.StrokeWidth }
         { model with  Shapes = Circle (shape) :: model.Shapes }
 
     member __.Attr (attr : Attr) (model : Model) : Circle =
@@ -138,7 +141,8 @@ and Rectangle =
         let (x, y) = model.Position
         let shape =
             { Rectangle.Default () with Position    = (float (x - 1) * blockSize, float (y - 1) * blockSize) 
-                                        StrokeColor = model.StrokeColor }
+                                        StrokeColor = model.StrokeColor 
+                                        StrokeWidth = model.StrokeWidth }
         { model with  Shapes = Rectangle (shape) :: model.Shapes }
 
     member __.Attr (attr : Attr) (model : Model) : Rectangle =
@@ -188,12 +192,39 @@ and Text =
         | FontSize    (size)  -> { __ with FontSize = size } 
         | _                   -> __
 
+and Path = 
+    { Data        : string 
+      StrokeColor : Color 
+      FillColor   : Color 
+      StrokeWidth : float }
+    static member Default () = 
+        { Data        = ""
+          StrokeWidth = 1.0
+          StrokeColor = Color.Black 
+          FillColor   = Color.White }
+    static member On (data : string) (model : Model) = 
+        let blockSize = model.BlockSize
+        let (x, y) = model.Position
+        let shape =
+            { Path.Default () with Data        = data
+                                   StrokeColor = model.StrokeColor 
+                                   StrokeWidth = model.StrokeWidth }
+        { model with  Shapes = Path (shape) :: model.Shapes }
+
+    member __.Attr (attr : Attr) (model : Model) : Path =
+        let blockSize = model.BlockSize 
+        match attr with
+        | StrokeWidth (width) -> { __ with StrokeWidth = width } 
+        | StrokeColor (color) -> { __ with StrokeColor = Color.FromName (color) } 
+        | FillColor (color)   -> { __ with FillColor = Color.FromName (color) } 
+        | _                   -> __
 
 and Shape = 
     | Line      of Line
     | Rectangle of Rectangle
     | Circle    of Circle
     | Text      of Text
+    | Path      of Path
 
 
 and Model = 
@@ -202,6 +233,7 @@ and Model =
       ColumnCount : int
       Position    : int * int
       StrokeColor : Color
+      StrokeWidth : float
       Shapes      : Shape list }
     with 
     member __.Shape = List.head __.Shapes
