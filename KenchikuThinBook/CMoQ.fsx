@@ -5,6 +5,7 @@
 #r "WindowsBase.dll"
 #r "PresentationCore.dll"
 
+open System
 open System.Windows
 open SvgDrawer
 open KTB
@@ -40,7 +41,7 @@ let drawBeam (x1, x2) (model) =
 
 let drawNode (x) (model) = 
     model
-    |> Action.Move(x,  10).On 
+    |> Action.Move(x, 10).On 
     |> Circle.On
     |> Attr.Radius(0.5).With
     |> Attr.FillColor("black").With
@@ -55,11 +56,24 @@ let drawDistributedLoad (x1, x2) (model) =
     |> Attr.StrokeWidth(1.0).With
     |> Attr.FillColor("gray").With
 
-let drawNodeMoment (ox, oy) (model) = 
-    let r = model.BlockSize * 2.0
+let drawNodeMoment (x, y) (model) = 
+    let r     = model.BlockSize * 2.0
+    let ox    = SvgHelper.coordinate model x 
+    let oy    = SvgHelper.coordinate model y 
+    let angle = 45.0 
+    let x1    = ox + r * System.Math.Cos (angle / 180.0 * System.Math.PI)
+    let y1    = oy + r * System.Math.Sin (angle / 180.0 * System.Math.PI) 
+    let x2    = ox + r * System.Math.Cos (angle / 180.0 * System.Math.PI)
+    let y2    = oy - r * System.Math.Sin (angle / 180.0 * System.Math.PI) 
     model
-    |> Action.Move(ox, oy).On
-    |> Path.On(Printf.sprintf "A %.0f %.0f 300.0 1 1" r r)    
+    |> Path.On(Printf.sprintf "M %.0f,%.0f A %.0f,%.0f %.1f 1,1 %.0f,%.0f" 
+                              x1 
+                              y1 
+                              r 
+                              r 
+                              angle
+                              x2 
+                              y2)    
 
 let (x1, x2) = (5, 21) 
 let (x3, x4) = (30, 46) 
@@ -73,3 +87,4 @@ model
 |> drawNode(x4)
 |> drawNodeMoment(x3, 10)
 |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\CMoQ.bmp"
+|> SvgHelper.draw @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\CMoQ.svg"

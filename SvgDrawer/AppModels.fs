@@ -3,14 +3,16 @@
 type Color =  
     { R : int 
       G : int
-      B : int }
+      B : int
+      A : int }
     with 
-    static member Black = { R =   0; G =   0; B =   0 }
-    static member White = { R = 255; G = 255; B = 255 }
-    static member Gray  = { R = 204; G = 204; B = 204 }
-    static member Red   = { R = 255; G =   0; B =   0 }
-    static member Green = { R =   0; G = 255; B =   0 }
-    static member Blue  = { R =   0; G =   0; B = 255 }
+    static member Transparent = { R = 255; G = 255; B = 255; A =   0 }
+    static member Black       = { R =   0; G =   0; B =   0; A = 255 }
+    static member White       = { R = 255; G = 255; B = 255; A = 255 }
+    static member Gray        = { R = 204; G = 204; B = 204; A = 255 }
+    static member Red         = { R = 255; G =   0; B =   0; A = 255 }
+    static member Green       = { R =   0; G = 255; B =   0; A = 255 }
+    static member Blue        = { R =   0; G =   0; B = 255; A = 255 }
     static member FromName (s : string) : Color =
         match s.ToLower () with
         | "black" -> Color.Black 
@@ -50,6 +52,7 @@ and Attr =
         | Circle    (circle)    :: tl -> { model with Shapes = Circle    (circle.Attr    __ model) :: tl }  
         | Rectangle (rectangle) :: tl -> { model with Shapes = Rectangle (rectangle.Attr __ model) :: tl }  
         | Text      (text)      :: tl -> { model with Shapes = Text      (text.Attr      __ model) :: tl }   
+        | Path      (path)      :: tl -> { model with Shapes = Path      (path.Attr      __ model) :: tl }    
         | [] -> model
     
     member __.WithDefault (model : Model) = 
@@ -201,10 +204,10 @@ and Path =
         { Data        = ""
           StrokeWidth = 1.0
           StrokeColor = Color.Black 
-          FillColor   = Color.White }
+          FillColor   = Color.Transparent }
     static member On (data : string) (model : Model) = 
         let blockSize = model.BlockSize
-        let (x, y) = model.Position
+        let (x, y)    = model.Position
         let shape =
             { Path.Default () with Data        = data
                                    StrokeColor = model.StrokeColor 
@@ -237,6 +240,5 @@ and Model =
       Shapes      : Shape list }
     with 
     member __.Shape = List.head __.Shapes
-
 
 

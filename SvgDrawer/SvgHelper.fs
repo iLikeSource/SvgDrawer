@@ -17,7 +17,11 @@ module SvgHelper =
         collection        
 
     let color (color : Color) = 
-        new SvgColourServer (System.Drawing.Color.FromArgb (color.R, color.G, color.B)) 
+        new SvgColourServer (System.Drawing.Color.FromArgb (color.A, color.R, color.G, color.B)) 
+
+
+    let coordinate (model : Model) (index : int) = 
+        margin + model.BlockSize * float (index - 1)
 
     let drawShape (doc : SvgDocument) (shape : Shape) =
         match shape with
@@ -102,10 +106,12 @@ module SvgHelper =
     let draw (path : string) (model : Model) = 
         let doc = build (model) 
         doc.Write (path)
+        model
     
     let save (path : string) (model : Model) = 
         let doc = build (model) 
         doc.Draw().Save(path)
+        model
 
                 
 
