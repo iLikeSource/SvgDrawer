@@ -233,7 +233,8 @@ and Arc =
     { Position    : float * float
       StartAngle  : float
       EndAngle    : float
-      R           : float 
+      R           : float
+      Clockwise   : bool
       StrokeColor : Color 
       FillColor   : Color 
       StrokeWidth : float }
@@ -241,11 +242,12 @@ and Arc =
         { Position    = (0.0, 0.0)
           StartAngle  = 0.0
           EndAngle    = 90.0
-          R           = 10.0  
+          R           = 10.0
+          Clockwise   = true
           StrokeWidth = 1.0
           StrokeColor = Color.Black 
           FillColor   = Color.Transparent }
-    static member On (r, startAngle, endAngle) (model : Model) = 
+    static member On (r, startAngle, endAngle, clockwise) (model : Model) = 
         let blockSize = model.BlockSize
         let (x, y)    = model.Position
         let shape =
@@ -253,6 +255,7 @@ and Arc =
                                   StartAngle  = startAngle
                                   EndAngle    = endAngle
                                   R           = r
+                                  Clockwise   = clockwise
                                   StrokeColor = model.StrokeColor 
                                   StrokeWidth = model.StrokeWidth }
         { model with  Shapes = Arc (shape) :: model.Shapes }

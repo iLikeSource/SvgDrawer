@@ -104,9 +104,18 @@ module SvgHelper =
             let y1         = margin + oy + r * Math.Sin (startAngle / 180.0 * Math.PI) 
             let x2         = margin + ox + r * Math.Cos (endAngle   / 180.0 * Math.PI)
             let y2         = margin + oy + r * Math.Sin (endAngle   / 180.0 * Math.PI) 
+            let clockwise  = if arc.Clockwise then 1 else 0
+            let over180    = 
+                if arc.Clockwise then
+                    if Math.Abs (endAngle - startAngle) >= 180.0 then 1 
+                                                                 else 0
+                else
+                    if Math.Abs (endAngle - startAngle) <  180.0 then 1 
+                                                                 else 0
+            
             let data = 
-                Printf.sprintf "M %.0f,%.0f A %.0f,%.0f %.1f 1,1 %.0f,%.0f" 
-                               x1 y1 r r startAngle x2 y2 
+                Printf.sprintf "M %.0f,%.0f A %.0f,%.0f %.1f %d,%d %.0f,%.0f" 
+                               x1 y1 r r startAngle over180 clockwise x2 y2 
             svgPath.PathData    <- SvgPathBuilder.Parse(data)
             svgPath.StrokeWidth <- number (arc.StrokeWidth)
             svgPath.Stroke      <- color (arc.StrokeColor)

@@ -56,7 +56,7 @@ let drawDistributedLoad (x1, x2) (model) =
     |> Attr.StrokeWidth(1.0).With
     |> Attr.FillColor("gray").With
 
-let drawNodeMoment (x, y) (model) = 
+let drawNodeMoment (x, y, startAngle, endAngle, clockwise) (model) = 
     (*
     let r     = model.BlockSize * 2.0
     let ox    = SvgHelper.coordinate model x 
@@ -79,7 +79,7 @@ let drawNodeMoment (x, y) (model) =
     let r = model.BlockSize * 2.0
     model
     |> Action.Move(x, y).On
-    |> Arc.On(r, 45.0, 315.0)
+    |> Arc.On(r, startAngle, endAngle, clockwise)
     |> Attr.FillColor("transparent").With
       
 
@@ -110,8 +110,10 @@ let drawTriangle (ox, oy, angle) (model) =
 let r = model.BlockSize * 2.0
 let (x1, x2) = (5, 21) 
 let (x3, x4) = (30, 46) 
-let triangleX = model.BlockSize * (float (x3 - 1)) + r * Math.Cos(45.0 / 180.0 * Math.PI)
-let triangleY = model.BlockSize * (float (10 - 1)) - r * Math.Sin(45.0 / 180.0 * Math.PI) 
+let triangleXL = model.BlockSize * (float (x3 - 1)) + r * Math.Cos( 45.0 / 180.0 * Math.PI)
+let triangleYL = model.BlockSize * (float (10 - 1)) - r * Math.Sin( 45.0 / 180.0 * Math.PI) 
+let triangleXR = model.BlockSize * (float (x4 - 1)) + r * Math.Cos(135.0 / 180.0 * Math.PI)
+let triangleYR = model.BlockSize * (float (10 - 1)) - r * Math.Sin(135.0 / 180.0 * Math.PI) 
 model
 |> drawLeftBoundary(x1)
 |> drawRightBoundary(x2)
@@ -120,7 +122,9 @@ model
 |> drawBeam(x3, x4)
 |> drawNode(x3)
 |> drawNode(x4)
-|> drawNodeMoment(x3, 10)
-|> drawTriangle(triangleX, triangleY, 45.0)
+|> drawNodeMoment(x3, 10,  45.0, 315.0, true)
+|> drawNodeMoment(x4, 10, 135.0, 225.0, false)
+|> drawTriangle(triangleXL, triangleYL,  45.0)
+|> drawTriangle(triangleXR, triangleYR, 135.0)
 |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\CMoQ.bmp"
 |> SvgHelper.draw @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\CMoQ.svg"
