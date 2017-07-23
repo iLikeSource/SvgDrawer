@@ -2,6 +2,7 @@
 
 module SvgHelper =
 
+    open System
     open System.Windows
     open Svg
 
@@ -93,6 +94,45 @@ module SvgHelper =
             svgPath.Stroke      <- color (path.StrokeColor)
             svgPath.Fill        <- color (path.FillColor)
             doc.Children.Add (svgPath)
+        | Arc (arc) ->
+            let svgPath    = new SvgPath ()
+            let (ox, oy)   = arc.Position
+            let r          = arc.R
+            let startAngle = arc.StartAngle
+            let endAngle   = arc.EndAngle
+            let x1         = margin + ox + r * Math.Cos (startAngle / 180.0 * Math.PI)
+            let y1         = margin + oy + r * Math.Sin (startAngle / 180.0 * Math.PI) 
+            let x2         = margin + ox + r * Math.Cos (endAngle   / 180.0 * Math.PI)
+            let y2         = margin + oy + r * Math.Sin (endAngle   / 180.0 * Math.PI) 
+            let data = 
+                Printf.sprintf "M %.0f,%.0f A %.0f,%.0f %.1f 1,1 %.0f,%.0f" 
+                               x1 y1 r r startAngle x2 y2 
+            svgPath.PathData    <- SvgPathBuilder.Parse(data)
+            svgPath.StrokeWidth <- number (arc.StrokeWidth)
+            svgPath.Stroke      <- color (arc.StrokeColor)
+            svgPath.Fill        <- color (arc.FillColor)
+            doc.Children.Add (svgPath)
+        | Triangle (triangle) ->
+            let svgPath    = new SvgPath ()
+            let (ox, oy)   = triangle.Position
+            let r          = triangle.R
+            let angle      = triangle.Angle
+            let x1 = margin + ox + r * Math.Cos ((  0.0 + angle) / 180.0 * Math.PI) 
+            let y1 = margin + oy + r * Math.Sin ((  0.0 + angle) / 180.0 * Math.PI) 
+            let x2 = margin + ox + r * Math.Cos ((120.0 + angle) / 180.0 * Math.PI) 
+            let y2 = margin + oy + r * Math.Sin ((120.0 + angle) / 180.0 * Math.PI) 
+            let x3 = margin + ox + r * Math.Cos ((240.0 + angle) / 180.0 * Math.PI) 
+            let y3 = margin + oy + r * Math.Sin ((240.0 + angle) / 180.0 * Math.PI) 
+            let data = 
+                Printf.sprintf "M %.0f,%.0f %.0f,%.0f %.0f,%.0f z" 
+                               x1 y1 x2 y2 x3 y3
+            svgPath.PathData    <- SvgPathBuilder.Parse(data)
+            svgPath.StrokeWidth <- number (triangle.StrokeWidth)
+            svgPath.Stroke      <- color (triangle.StrokeColor)
+            svgPath.Fill        <- color (triangle.FillColor)
+            doc.Children.Add (svgPath)
+
+
             
     let build (model : Model) = 
         let doc = new SvgDocument ()

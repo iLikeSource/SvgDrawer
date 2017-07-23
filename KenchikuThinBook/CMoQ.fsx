@@ -57,14 +57,15 @@ let drawDistributedLoad (x1, x2) (model) =
     |> Attr.FillColor("gray").With
 
 let drawNodeMoment (x, y) (model) = 
+    (*
     let r     = model.BlockSize * 2.0
     let ox    = SvgHelper.coordinate model x 
     let oy    = SvgHelper.coordinate model y 
     let angle = 45.0 
-    let x1    = ox + r * System.Math.Cos (angle / 180.0 * System.Math.PI)
-    let y1    = oy + r * System.Math.Sin (angle / 180.0 * System.Math.PI) 
-    let x2    = ox + r * System.Math.Cos (angle / 180.0 * System.Math.PI)
-    let y2    = oy - r * System.Math.Sin (angle / 180.0 * System.Math.PI) 
+    let x1    = ox + r * Math.Cos (angle / 180.0 * Math.PI)
+    let y1    = oy + r * Math.Sin (angle / 180.0 * Math.PI) 
+    let x2    = ox + r * Math.Cos (angle / 180.0 * Math.PI)
+    let y2    = oy - r * Math.Sin (angle / 180.0 * Math.PI) 
     model
     |> Path.On(Printf.sprintf "M %.0f,%.0f A %.0f,%.0f %.1f 1,1 %.0f,%.0f" 
                               x1 
@@ -73,10 +74,44 @@ let drawNodeMoment (x, y) (model) =
                               r 
                               angle
                               x2 
-                              y2)    
+                              y2)
+    *)
+    let r = model.BlockSize * 2.0
+    model
+    |> Action.Move(x, y).On
+    |> Arc.On(r, 45.0, 315.0)
+    |> Attr.FillColor("transparent").With
+      
 
+let drawTriangle (ox, oy, angle) (model) =
+    (*
+    let l  = model.BlockSize 
+    let x1 = ox + l * Math.Cos ((  0.0 + angle) / 180.0 * Math.PI) 
+    let y1 = oy + l * Math.Sin ((  0.0 + angle) / 180.0 * Math.PI) 
+    let x2 = ox + l * Math.Cos ((120.0 + angle) / 180.0 * Math.PI) 
+    let y2 = oy + l * Math.Sin ((120.0 + angle) / 180.0 * Math.PI) 
+    let x3 = ox + l * Math.Cos ((240.0 + angle) / 180.0 * Math.PI) 
+    let y3 = oy + l * Math.Sin ((240.0 + angle) / 180.0 * Math.PI) 
+    model
+    |> Path.On(Printf.sprintf "M %.0f,%.0f %.0f,%.0f %.0f,%.0f z" 
+                              x1 y1
+                              x2 y2
+                              x3 y3)
+    |> Attr.FillColor("black").With
+    *)
+    let r = model.BlockSize
+    model
+    |> Triangle.On(r, 45.0)
+    |> Attr.Position(ox, oy).With
+    |> Attr.FillColor("black").With
+
+
+
+let r = model.BlockSize * 2.0
 let (x1, x2) = (5, 21) 
 let (x3, x4) = (30, 46) 
+let triangleX = model.BlockSize * (float (x3 - 1)) + r * Math.Cos(45.0 / 180.0 * Math.PI)
+let triangleY = model.BlockSize * (float (10 - 1)) - r * Math.Sin(45.0 / 180.0 * Math.PI) 
 model
 |> drawLeftBoundary(x1)
 |> drawRightBoundary(x2)
@@ -86,5 +121,6 @@ model
 |> drawNode(x3)
 |> drawNode(x4)
 |> drawNodeMoment(x3, 10)
+|> drawTriangle(triangleX, triangleY, 45.0)
 |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\CMoQ.bmp"
 |> SvgHelper.draw @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\CMoQ.svg"

@@ -15,12 +15,13 @@ type Color =
     static member Blue        = { R =   0; G =   0; B = 255; A = 255 }
     static member FromName (s : string) : Color =
         match s.ToLower () with
-        | "black" -> Color.Black 
-        | "white" -> Color.White 
-        | "gray"  -> Color.Gray 
-        | "blue"  -> Color.Blue 
-        | "red"   -> Color.Red 
-        | "green" -> Color.Green 
+        | "transparent" -> Color.Transparent 
+        | "black"       -> Color.Black 
+        | "white"       -> Color.White 
+        | "gray"        -> Color.Gray 
+        | "blue"        -> Color.Blue 
+        | "red"         -> Color.Red 
+        | "green"       -> Color.Green 
         | _       -> failwith "未実装" 
 
 
@@ -38,6 +39,7 @@ type Action =
             { model with Position = (x0 + x, y0 + y) } 
 
 and Attr =
+    | Position    of float * float 
     | Width       of float 
     | Height      of float 
     | Radius      of float 
@@ -53,6 +55,8 @@ and Attr =
         | Rectangle (rectangle) :: tl -> { model with Shapes = Rectangle (rectangle.Attr __ model) :: tl }  
         | Text      (text)      :: tl -> { model with Shapes = Text      (text.Attr      __ model) :: tl }   
         | Path      (path)      :: tl -> { model with Shapes = Path      (path.Attr      __ model) :: tl }    
+        | Arc       (arc)       :: tl -> { model with Shapes = Arc       (arc.Attr       __ model) :: tl }     
+        | Triangle  (triangle)  :: tl -> { model with Shapes = Triangle  (triangle.Attr  __ model) :: tl }     
         | [] -> model
     
     member __.WithDefault (model : Model) = 
@@ -116,6 +120,7 @@ and Circle =
     member __.Attr (attr : Attr) (model : Model) : Circle =
         let blockSize = model.BlockSize 
         match attr with
+        | Position    (x, y)   -> { __ with Position = (x, y) }
         | Width       (width)  -> { __ with R = width  * blockSize }
         | Height      (height) -> { __ with R = height * blockSize } 
         | Radius      (radius) -> { __ with R = radius * blockSize }  
@@ -151,6 +156,7 @@ and Rectangle =
     member __.Attr (attr : Attr) (model : Model) : Rectangle =
         let blockSize = model.BlockSize 
         match attr with
+        | Position  (x, y)    -> { __ with Position = (x, y) }
         | Width     (width)   -> { __ with W = width  * blockSize }
         | Height    (height)  -> { __ with H = height * blockSize } 
         | StrokeWidth (width) -> { __ with StrokeWidth = width } 
@@ -191,6 +197,7 @@ and Text =
     member __.Attr (attr : Attr) (model : Model) : Text =
         let blockSize = model.BlockSize 
         match attr with
+        | Position  (x, y)    -> { __ with Position = (x, y) }
         | StrokeColor (color) -> { __ with Color = Color.FromName (color) } 
         | FontSize    (size)  -> { __ with FontSize = size } 
         | _                   -> __
@@ -222,12 +229,93 @@ and Path =
         | FillColor (color)   -> { __ with FillColor = Color.FromName (color) } 
         | _                   -> __
 
+and Arc = 
+    { Position    : float * float
+      StartAngle  : float
+      EndAngle    : float
+      R           : float 
+      StrokeColor : Color 
+      FillColor   : Color 
+      StrokeWidth : float }
+    static member Default () = 
+        { Position    = (0.0, 0.0)
+          StartAngle  = 0.0
+          EndAngle    = 90.0
+          R           = 10.0  
+          StrokeWidth = 1.0
+          StrokeColor = Color.Black 
+          FillColor   = Color.Transparent }
+    static member On (r, startAngle, endAngle) (model : Model) = 
+        let blockSize = model.BlockSize
+        let (x, y)    = model.Position
+        let shape =
+            { Arc.Default () with Position    = (float (x - 1) * blockSize, float (y - 1) * blockSize)  
+                                  StartAngle  = startAngle
+                                  EndAngle    = endAngle
+                                  R           = r
+                                  StrokeColor = model.StrokeColor 
+                                  StrokeWidth = model.StrokeWidth }
+        { model with  Shapes = Arc (shape) :: model.Shapes }
+
+    member __.Attr (attr : Attr) (model : Model) : Arc =
+        let blockSize = model.BlockSize 
+        match attr with
+        | Position  (x, y)    -> { __ with Position = (x, y) }
+        | StrokeWidth (width) -> { __ with StrokeWidth = width } 
+        | StrokeColor (color) -> { __ with StrokeColor = Color.FromName (color) } 
+        | FillColor (color)   -> { __ with FillColor = Color.FromName (color) } 
+        | Width      (width)  -> { __ with R = width  * blockSize }
+        | Height     (height) -> { __ with R = height * blockSize } 
+        | Radius     (radius) -> { __ with R = radius * blockSize }  
+        | _                   -> __
+
+and Triangle  = 
+    { Position    : float * float
+      Angle       : float
+      R           : float 
+      StrokeColor : Color 
+      FillColor   : Color 
+      StrokeWidth : float }
+    static member Default () = 
+        { Position    = (0.0, 0.0)
+          Angle       = 0.0
+          R           = 10.0  
+          StrokeWidth = 1.0
+          StrokeColor = Color.Black 
+          FillColor   = Color.Transparent }
+    static member On (r, angle) (model : Model) = 
+        let blockSize = model.BlockSize
+        let (x, y)    = model.Position
+        let shape =
+            { Triangle.Default () with Position    = (float (x - 1) * blockSize, float (y - 1) * blockSize)  
+                                       Angle       = angle
+                                       R           = r
+                                       StrokeColor = model.StrokeColor 
+                                       StrokeWidth = model.StrokeWidth }
+        { model with  Shapes = Triangle (shape) :: model.Shapes }
+
+    member __.Attr (attr : Attr) (model : Model) : Triangle =
+        let blockSize = model.BlockSize 
+        match attr with
+        | Position  (x, y)    -> { __ with Position = (x, y) }
+        | StrokeWidth (width) -> { __ with StrokeWidth = width } 
+        | StrokeColor (color) -> { __ with StrokeColor = Color.FromName (color) } 
+        | FillColor (color)   -> { __ with FillColor = Color.FromName (color) } 
+        | Width      (width)  -> { __ with R = width  * blockSize }
+        | Height     (height) -> { __ with R = height * blockSize } 
+        | Radius     (radius) -> { __ with R = radius * blockSize }  
+        | _                   -> __
+
+
+
 and Shape = 
     | Line      of Line
     | Rectangle of Rectangle
     | Circle    of Circle
     | Text      of Text
     | Path      of Path
+    | Arc       of Arc
+    | Triangle  of Triangle
 
 
 and Model = 
