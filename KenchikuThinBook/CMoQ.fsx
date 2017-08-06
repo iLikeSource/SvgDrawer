@@ -94,6 +94,12 @@ let drawPlus (x, y) (model) =
     |> Line.To(x    , y - 1)
     |> Line.To(x    , y + 1)
 
+let drawTitle (x, y, title) (model) = 
+    model
+    |> Action.Move(x, y).On
+    |> Text.At (title, 0, 0)    
+    |> Attr.FontSize(10.0).With
+
 let r = model.BlockSize * 2.0
 let (x1, x2) = (5, 21) 
 let (x3, x4) = (30, 46) 
@@ -115,5 +121,7 @@ model
 |> drawTriangle(triangleXL, triangleYL,  45.0)
 |> drawTriangle(triangleXR, triangleYR, 135.0)
 |> drawPlus((x2 + x3) / 2, 10)
+|> drawTitle(16, 15, "A.両端固定による応力")
+|> drawTitle(48, 15, "B.固定端モーメントを解除する節点モーメント")
 |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\CMoQ.bmp"
 |> SvgHelper.draw @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\CMoQ.svg"
