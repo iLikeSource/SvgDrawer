@@ -15,6 +15,7 @@ let model : SvgDrawer.Model =
       ColumnCount = 20
       Position    = (0, 0) 
       StrokeColor = Color.Black
+      StrokeWidth = 2.0
       Shapes      = [] }
       
 let draw () = 

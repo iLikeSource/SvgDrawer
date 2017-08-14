@@ -22,7 +22,7 @@ type Color =
         | "blue"        -> Color.Blue 
         | "red"         -> Color.Red 
         | "green"       -> Color.Green 
-        | _       -> failwith "未実装" 
+        | _             -> failwith "未実装" 
 
 
 
@@ -39,14 +39,16 @@ type Action =
             { model with Position = (x0 + x, y0 + y) } 
 
 and Attr =
-    | Position    of float * float 
-    | Width       of float 
-    | Height      of float 
-    | Radius      of float 
-    | StrokeWidth of float 
-    | StrokeColor of string 
-    | FillColor   of string 
-    | FontSize    of float 
+    | Position     of float * float 
+    | RotateCenter of float * float 
+    | Angle        of float 
+    | Width        of float 
+    | Height       of float 
+    | Radius       of float 
+    | StrokeWidth  of float 
+    | StrokeColor  of string 
+    | FillColor    of string 
+    | FontSize     of float 
     with 
     member __.With (model : Model) = 
         match model.Shapes with
@@ -130,39 +132,48 @@ and Circle =
         | _                    -> __
 
 and Rectangle = 
-    { Position    : float * float 
-      W           : float 
-      H           : float  
-      StrokeWidth : float
-      StrokeColor : Color 
-      FillColor   : Color } 
+    { Position     : float * float 
+      W            : float 
+      H            : float
+      Angle        : float  
+      RotateCenter : float * float 
+      StrokeWidth  : float
+      StrokeColor  : Color 
+      FillColor    : Color } 
     with 
     static member Default () = 
-        { Position    = (0.0, 0.0)
-          W           = 10.0
-          H           = 10.0
-          StrokeWidth = 1.0
-          StrokeColor = Color.Black 
-          FillColor   = Color.White }
+        { Position     = (0.0, 0.0)
+          W            = 10.0
+          H            = 10.0
+          Angle        = 0.0
+          RotateCenter = (0.0, 0.0)
+          StrokeWidth  = 1.0
+          StrokeColor  = Color.Black 
+          FillColor    = Color.White }
     static member On (model : Model) = 
         let blockSize = model.BlockSize
-        let (x, y) = model.Position
+        let (x, y)    = model.Position
+        let coordX    = float (x - 1) * blockSize
+        let coordY    = float (y - 1) * blockSize
         let shape =
-            { Rectangle.Default () with Position    = (float (x - 1) * blockSize, float (y - 1) * blockSize) 
-                                        StrokeColor = model.StrokeColor 
-                                        StrokeWidth = model.StrokeWidth }
+            { Rectangle.Default () with Position     = (coordX, coordY) 
+                                        RotateCenter = (coordX, coordY) 
+                                        StrokeColor  = model.StrokeColor 
+                                        StrokeWidth  = model.StrokeWidth }
         { model with  Shapes = Rectangle (shape) :: model.Shapes }
 
     member __.Attr (attr : Attr) (model : Model) : Rectangle =
         let blockSize = model.BlockSize 
         match attr with
-        | Position  (x, y)    -> { __ with Position = (x, y) }
-        | Width     (width)   -> { __ with W = width  * blockSize }
-        | Height    (height)  -> { __ with H = height * blockSize } 
-        | StrokeWidth (width) -> { __ with StrokeWidth = width } 
-        | StrokeColor (color) -> { __ with StrokeColor = Color.FromName (color) } 
-        | FillColor (color)   -> { __ with FillColor = Color.FromName (color) } 
-        | _                   -> __
+        | Position     (x, y)   -> { __ with Position = (x, y) }
+        | RotateCenter (x, y)   -> { __ with RotateCenter = (x, y) }
+        | Angle        (angle)  -> { __ with Angle = angle }
+        | Width        (width)  -> { __ with W = width  * blockSize }
+        | Height       (height) -> { __ with H = height * blockSize } 
+        | StrokeWidth  (width)  -> { __ with StrokeWidth = width } 
+        | StrokeColor  (color)  -> { __ with StrokeColor = Color.FromName (color) } 
+        | FillColor    (color)  -> { __ with FillColor = Color.FromName (color) } 
+        | _                     -> __
 
 and Text = 
     { Position : float * float 

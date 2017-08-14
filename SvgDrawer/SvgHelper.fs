@@ -48,16 +48,25 @@ module SvgHelper =
             svgCircle.Fill        <- color (circle.FillColor)
             doc.Children.Add (svgCircle)
         | Rectangle (rectangle) ->
-            let (x, y) = rectangle.Position
+            let (x, y)    = rectangle.Position
+            let coordX    = margin + x
+            let coordY    = margin + y
+            let (rx, ry)  = rectangle.RotateCenter 
+            let transform = new Transforms.SvgRotate (float32 rectangle.Angle) 
+            transform.CenterX <- float32 rx            
+            transform.CenterY <- float32 ry            
+
             let svgRectangle = new SvgRectangle ()
-            let path = new SvgPath ()
-            svgRectangle.X           <- number (margin + x - 0.5 * rectangle.W)
-            svgRectangle.Y           <- number (margin + y - 0.5 * rectangle.H)
+            let path         = new SvgPath ()
+            svgRectangle.X           <- number (coordX - 0.5 * rectangle.W)
+            svgRectangle.Y           <- number (coordY - 0.5 * rectangle.H)
             svgRectangle.Width       <- number rectangle.W
             svgRectangle.Height      <- number rectangle.H
             svgRectangle.StrokeWidth <- number (rectangle.StrokeWidth)
             svgRectangle.Stroke      <- color (rectangle.StrokeColor)
             svgRectangle.Fill        <- color (rectangle.FillColor)
+            svgRectangle.FillOpacity <- float32 (rectangle.FillColor.A / 255)  
+            svgRectangle.Transforms.Add (transform)
             doc.Children.Add (svgRectangle)
         | Text (text) -> 
             let (x, y)  = text.Position
