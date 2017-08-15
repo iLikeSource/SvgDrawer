@@ -10,10 +10,10 @@ open SvgDrawer
 open KTB
 
 
-let model : SvgDrawer.Model = 
+let initModel (rowCount, clmCount) : SvgDrawer.Model = 
     { BlockSize   = 10.0 
-      RowCount    = 20 
-      ColumnCount = 20
+      RowCount    = rowCount 
+      ColumnCount = clmCount
       Position    = (0, 0) 
       StrokeColor = Color.Black
       StrokeWidth = 1.0
@@ -79,7 +79,7 @@ let drawMovedRectangle (xs, ys) (angle, offsetRx, offsetRy) (model : SvgDrawer.M
 
 let ys' = ys |> List.map (fun y -> y + 10)
 
-model
+initModel (20, 20)
 |> drawPlan (xs, ys)
 |> drawWall (xs, ys) 2
 |> drawColumn (xs, ys)
@@ -90,3 +90,52 @@ model
 |> drawMovedRectangle (xs, ys') (-8.0, 0, -2)
 |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\Eccentricity.Plan.bmp"
 |> SvgHelper.draw @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\Eccentricity.Plan.svg"
+
+let drawWallRect (pairs : (int * int) array) (model : SvgDrawer.Model) = 
+    let (x0, y0) = pairs.[0]
+    let tl = Array.sub pairs 1 3
+    let toF (v) = SvgHelper.coordinate model v
+    let data =
+        tl
+        |> Array.fold (fun dst (x, y) -> Printf.sprintf "%s L %.0f %.0f " dst (toF x) (toF y)) 
+                      (Printf.sprintf "M %.0f %.0f " (toF x0) (toF y0))   
+        |> Printf.sprintf "%s z"
+    model
+    |> Path.On(data)
+    |> Attr.FillColor("gray").With 
+
+let drawDeformationFrame (offsetX, offsetY, magnify) (model : SvgDrawer.Model) = 
+    model
+    |> Action.Move(offsetX + 2, offsetY + 16).On
+    |> Line.To(offsetX + 2 + 4 * magnify, offsetY + 4)
+    |> Action.Move(offsetX + 6, offsetY + 16).On
+    |> Line.To(offsetX + 6 + 4 * magnify, offsetY + 4)
+    |> Action.Move(offsetX + 10, offsetY + 16).On
+    |> Line.To(offsetX + 10 + 4 * magnify, offsetY + 4)
+
+    |> Action.Move(offsetX + 2 + 4 * magnify, offsetY + 4).On
+    |> Line.To(offsetX + 10 + 4 * magnify, offsetY + 4)
+    |> Action.Move(offsetX + 2 + 3 * magnify, offsetY + 7).On
+    |> Line.To(offsetX + 10 + 3 * magnify, offsetY + 7)
+    |> Action.Move(offsetX + 2 + 2 * magnify, offsetY + 10).On
+    |> Line.To(offsetX + 10 + 2 * magnify, offsetY + 10)
+    |> Action.Move(offsetX + 2 + 1 * magnify, offsetY + 13).On
+    |> Line.To(offsetX + 10 + 1 * magnify, offsetY + 13)
+    |> Action.Move(offsetX + 2, offsetY + 16).On
+    |> Line.To(offsetX + 10, offsetY + 16)
+
+initModel (40, 40)
+|> drawWallRect [| (2, 16); (10, 16); (14, 4); (6, 4) |]
+|> drawDeformationFrame (0, 0, 1)
+|> drawDeformationFrame (0, 20, 1) 
+|> Action.Move(14, 2).On 
+|> Line.To(14, 36)
+|> Attr.StrokeColor("blue").With
+
+|> drawWallRect [| (22, 16); (30, 16); (34, 4); (26, 4) |]
+|> drawDeformationFrame (20, 0, 1)
+|> drawDeformationFrame (20, 20, 2) 
+|> Action.Move(34, 2).On 
+|> Line.To(34, 36)
+|> Attr.StrokeColor("blue").With
+|> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\Eccentricity.Elevation.bmp"
