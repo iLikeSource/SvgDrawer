@@ -77,6 +77,12 @@ let drawMovedRectangle (xs, ys) (angle, offsetRx, offsetRy) (model : SvgDrawer.M
     |> Attr.RotateCenter(float (x + offsetRx) * blockSize, float (y + offsetRy) * blockSize ).With
     |> Attr.Angle(angle).With
 
+let drawTitle (x, y, title) (model) = 
+    model
+    |> Action.Move(x, y).On
+    |> Text.At (title, 0, 0)    
+    |> Attr.FontSize(10.0).With
+
 let ys' = ys |> List.map (fun y -> y + 10)
 
 initModel (20, 20)
@@ -84,10 +90,12 @@ initModel (20, 20)
 |> drawWall (xs, ys) 2
 |> drawColumn (xs, ys)
 |> drawMovedRectangle (xs, ys) (0.0, 0, 0)
+|> drawTitle (10, 8, "平面フレーム")
 |> drawPlan (xs, ys')
 |> drawWall (xs, ys') 12
 |> drawColumn (xs, ys')
 |> drawMovedRectangle (xs, ys') (-8.0, 0, -2)
+|> drawTitle (10, 18, "立体フレーム")
 |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\Eccentricity.Plan.bmp"
 |> SvgHelper.draw @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\Eccentricity.Plan.svg"
 
@@ -124,6 +132,7 @@ let drawDeformationFrame (offsetX, offsetY, magnify) (model : SvgDrawer.Model) =
     |> Action.Move(offsetX + 2, offsetY + 16).On
     |> Line.To(offsetX + 10, offsetY + 16)
 
+
 initModel (40, 40)
 |> drawWallRect [| (2, 16); (10, 16); (14, 4); (6, 4) |]
 |> drawDeformationFrame (0, 0, 1)
@@ -131,6 +140,7 @@ initModel (40, 40)
 |> Action.Move(14, 2).On 
 |> Line.To(14, 36)
 |> Attr.StrokeColor("blue").With
+|> drawTitle (14, 38, "平面フレーム(ねじれ考慮なし)") 
 
 |> drawWallRect [| (22, 16); (30, 16); (34, 4); (26, 4) |]
 |> drawDeformationFrame (20, 0, 1)
@@ -138,4 +148,6 @@ initModel (40, 40)
 |> Action.Move(34, 2).On 
 |> Line.To(34, 36)
 |> Attr.StrokeColor("blue").With
+|> drawTitle (34, 38, "立体フレーム(ねじれ考慮あり)") 
+
 |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\Eccentricity.Elevation.bmp"
