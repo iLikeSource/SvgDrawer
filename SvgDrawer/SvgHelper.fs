@@ -24,9 +24,10 @@ module SvgHelper =
     let coordinate (model : Model) (index : int) = 
         margin + model.BlockSize * float (index - 1)
 
-    let drawShape (doc : SvgDocument) (shape : Shape) =
+    let rec drawShape (doc : SvgDocument) (shape : Shape) =
         match shape with
-        | Line (line) ->
+        | Line      (line) 
+        | ArrowLine (line) ->
             let (x0, y0) = line.Start
             let (x1, y1) = line.End
             let svgLine = new SvgLine ()
@@ -37,6 +38,27 @@ module SvgHelper =
             svgLine.StrokeWidth <- number (line.StrokeWidth)
             svgLine.Stroke      <- color (line.StrokeColor)
             doc.Children.Add (svgLine)
+
+            match shape with
+            | ArrowLine _ ->
+                //  角度を取得
+                let angle = 
+                    if x0 = x1 then 
+                        if y1 >= y0 then  90.0
+                                    else -90.0
+                    else Math.Atan ((y1 - y0) / (x1 - x0)) / Math.PI * 180.0    
+                //  半径は決め打ち
+                let r = 5.0
+                let triangle = 
+                    { Triangle.Position    = (x1, y1) 
+                      Triangle.Angle       = angle
+                      Triangle.R           = r
+                      Triangle.StrokeColor = line.StrokeColor
+                      Triangle.StrokeWidth = line.StrokeWidth
+                      Triangle.FillColor   = line.StrokeColor }
+                drawShape doc (Triangle triangle)
+            | _ -> ()
+
         | Circle (circle) ->
             let (x, y) = circle.Position
             let svgCircle = new SvgCircle ()

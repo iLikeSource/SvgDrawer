@@ -53,6 +53,7 @@ and Attr =
     member __.With (model : Model) = 
         match model.Shapes with
         | Line      (line)      :: tl -> { model with Shapes = Line      (line.Attr      __ model) :: tl } 
+        | ArrowLine (line)      :: tl -> { model with Shapes = ArrowLine (line.Attr      __ model) :: tl } 
         | Circle    (circle)    :: tl -> { model with Shapes = Circle    (circle.Attr    __ model) :: tl }  
         | Rectangle (rectangle) :: tl -> { model with Shapes = Rectangle (rectangle.Attr __ model) :: tl }  
         | Text      (text)      :: tl -> { model with Shapes = Text      (text.Attr      __ model) :: tl }   
@@ -78,17 +79,29 @@ and Line =
           End         = (0.0, 0.0)
           StrokeWidth = 1.0
           StrokeColor = Color.Black }
-    static member To (x, y) (model : Model) = 
+    static member private buildShape (x, y) (model : Model) =
         let blockSize = model.BlockSize
         let (startX, startY) = model.Position
         let (endX  , endY  ) = (x, y)
-        let shape =
-            { Line.Default () with Start       = (float (startX - 1) * blockSize, float (startY - 1) * blockSize) 
-                                   End         = (float (endX   - 1) * blockSize, float (endY   - 1) * blockSize) 
-                                   StrokeColor = model.StrokeColor 
-                                   StrokeWidth = model.StrokeWidth  }
+        { Line.Default () with Start       = (float (startX - 1) * blockSize, float (startY - 1) * blockSize) 
+                               End         = (float (endX   - 1) * blockSize, float (endY   - 1) * blockSize) 
+                               StrokeColor = model.StrokeColor 
+                               StrokeWidth = model.StrokeWidth  }
+    
+    static member To (x, y) (model : Model) = 
         { model with Position = (x, y)
-                     Shapes   = Line (shape) :: model.Shapes }
+                     Shapes   = Line (Line.buildShape (x, y) model) :: model.Shapes }
+    
+    static member ArrowTo (x, y) (model : Model) = 
+        { model with Position = (x, y)
+                     Shapes   = ArrowLine (Line.buildShape (x, y) model) :: model.Shapes }
+    
+    static member DirectTo (coordX0, coordY0, coordX1, coordY1) (model : Model) =
+        let line =  { Line.Default () with Start       = (coordX0, coordY0) 
+                                           End         = (coordX1, coordY1) 
+                                           StrokeColor = model.StrokeColor 
+                                           StrokeWidth = model.StrokeWidth  }
+        { model with Shapes   = Line (line) :: model.Shapes }
 
     member __.Attr (attr : Attr) (model : Model) : Line = 
         match attr with
@@ -324,6 +337,7 @@ and Triangle  =
 
 and Shape = 
     | Line      of Line
+    | ArrowLine of Line
     | Rectangle of Rectangle
     | Circle    of Circle
     | Text      of Text

@@ -83,19 +83,20 @@ let drawTitle (x, y, title) (model) =
     |> Text.At (title, 0, 0)    
     |> Attr.FontSize(10.0).With
 
+let xs' = xs |> List.map (fun y -> y + 20)
 let ys' = ys |> List.map (fun y -> y + 10)
 
-initModel (20, 20)
+initModel (15, 40)
 |> drawPlan (xs, ys)
 |> drawWall (xs, ys) 2
 |> drawColumn (xs, ys)
 |> drawMovedRectangle (xs, ys) (0.0, 0, 0)
 |> drawTitle (10, 8, "平面フレーム")
-|> drawPlan (xs, ys')
-|> drawWall (xs, ys') 12
-|> drawColumn (xs, ys')
-|> drawMovedRectangle (xs, ys') (-8.0, 0, -2)
-|> drawTitle (10, 18, "立体フレーム")
+|> drawPlan (xs', ys)
+|> drawWall (xs', ys) 2
+|> drawColumn (xs', ys)
+|> drawMovedRectangle (xs', ys) (-8.0, 0, -2)
+|> drawTitle (30, 8, "立体フレーム")
 |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\Eccentricity.Plan.bmp"
 |> SvgHelper.draw @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\Eccentricity.Plan.svg"
 
