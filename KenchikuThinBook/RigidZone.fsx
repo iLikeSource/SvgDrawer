@@ -42,7 +42,7 @@ let draw () =
     |> Attr.StrokeWidth(5.0).With
     |> Action.Move(16, 2).On
     |> Text.At ("剛域", 0, 0)
-    |> Attr.FontSize(10.0).With
+    |> Attr.FontSize(14.0).With
     |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\RigidZone.bmp"
 
            

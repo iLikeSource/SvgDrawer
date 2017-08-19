@@ -11,11 +11,12 @@ open SvgDrawer
 open KTB
 
 let model : SvgDrawer.Model = 
-    { BlockSize   = 10.0 
+    { BlockSize   = 20.0 
       RowCount    = 10 
       ColumnCount = 20
       Position    = (0, 0) 
       StrokeColor = Color.Black
+      StrokeWidth = 2.0
       Shapes      = [] }
 
 let draw () = 
@@ -36,10 +37,10 @@ let draw () =
     |> Line.To(16, 2)
     |> Action.Move(6, 8).On
     |> Text.At ("片持柱", 0, 1)
-    |> Attr.FontSize(10.0).With
+    |> Attr.FontSize(16.0).With
     |> Action.Move(16, 8).On
     |> Text.At ("逆対称", 0, 1)
-    |> Attr.FontSize(10.0).With
+    |> Attr.FontSize(16.0).With
     |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\InflectionPoint.bmp"
 
            

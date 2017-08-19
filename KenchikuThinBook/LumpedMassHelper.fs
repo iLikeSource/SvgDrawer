@@ -16,7 +16,7 @@ module LumpedMassHelper =
               BottomY      = 40 
               StorySpan    = 10
               AxisOffset   = 10
-              MomentOffset = 10 }
+              MomentOffset =  5 }
 
     let repeat times (f : int -> Model -> Model) = 
         fun model ->
@@ -56,7 +56,7 @@ module LumpedMassHelper =
         |> repeat size (fun i x -> 
             x
             |> Text.At(Printf.sprintf "H%d" (size - i + 1), 1, 0)
-            |> Attr.FontSize(12.0).With
+            |> Attr.FontSize(16.0).With
             |> Action.RMove(0, config.StorySpan).On
         )
             

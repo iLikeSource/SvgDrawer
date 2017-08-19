@@ -52,6 +52,7 @@
     <None Include="CMoQ.fsx" />
     <None Include="Eccentricity.fsx" />
     <None Include="MNInteraction.fsx" />
+    <None Include="SlabLoad.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SvgDrawer\SvgDrawer.fsproj">

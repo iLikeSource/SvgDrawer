@@ -10,10 +10,24 @@ open System.Windows
 open SvgDrawer
 open KTB
 
+let model : SvgDrawer.Model = 
+    { BlockSize   = 10.0 
+      RowCount    =  50 
+      ColumnCount = 120
+      Position    = (0, 0) 
+      StrokeColor = Color.Black
+      StrokeWidth = 1.0
+      Shapes      = [] }
 
 let result = 
-    let config = LumpedMassHelper.Config.Create ()
-    let draw   = LumpedMassHelper.draw (config)
+    let config       = LumpedMassHelper.Config.Create ()
+    let draw         = LumpedMassHelper.draw (config)
+    let centerX      = model.ColumnCount / 2 + 1
+    let centerY      = model.RowCount / 2 + 1
+    let topY         = config.TopY
+    let bottomY      = config.BottomY
+    let momentOffset = config.MomentOffset
+    let storySpan    = config.StorySpan
     model
     //  質点棒
     |> draw (3)
@@ -22,7 +36,7 @@ let result =
     |> Line.To(centerX - 3 * momentOffset, bottomY)
     |> Attr.StrokeWidth(1.0).With
     |> Action.Move(centerX, topY).On
-    |> repeat 3 (fun i x -> 
+    |> LumpedMassHelper.repeat 3 (fun i x -> 
         let lText = Printf.sprintf "M%d" (3 - i)
         let rText  = 
             [| 1 .. i |]
@@ -37,7 +51,7 @@ let result =
         |> Action.Move(centerX, topY + i * storySpan).On
         |> Line.To(centerX - i * momentOffset, topY + i * storySpan)        
         |> Text.At(Printf.sprintf "%s=%s" lText rText, -1, 0)
-        |> Attr.FontSize(12.0).With
+        |> Attr.FontSize(16.0).With
     )
 
 

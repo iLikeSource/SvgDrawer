@@ -64,10 +64,10 @@ module SvgHelper =
             let svgCircle = new SvgCircle ()
             svgCircle.CenterX     <- number (margin + x)
             svgCircle.CenterY     <- number (margin + y)
-            svgCircle.Radius      <- number circle.R
+            svgCircle.Radius      <- number (circle.R)
             svgCircle.StrokeWidth <- number (circle.StrokeWidth)
-            svgCircle.Stroke      <- color (circle.StrokeColor)
-            svgCircle.Fill        <- color (circle.FillColor)
+            svgCircle.Stroke      <- color  (circle.StrokeColor)
+            svgCircle.Fill        <- color  (circle.FillColor)
             doc.Children.Add (svgCircle)
         | Rectangle (rectangle) ->
             let (x, y)    = rectangle.Position
@@ -80,13 +80,13 @@ module SvgHelper =
 
             let svgRectangle = new SvgRectangle ()
             let path         = new SvgPath ()
-            svgRectangle.X           <- number (coordX - 0.5 * rectangle.W)
-            svgRectangle.Y           <- number (coordY - 0.5 * rectangle.H)
-            svgRectangle.Width       <- number rectangle.W
-            svgRectangle.Height      <- number rectangle.H
-            svgRectangle.StrokeWidth <- number (rectangle.StrokeWidth)
-            svgRectangle.Stroke      <- color (rectangle.StrokeColor)
-            svgRectangle.Fill        <- color (rectangle.FillColor)
+            svgRectangle.X           <- number  (coordX - 0.5 * rectangle.W)
+            svgRectangle.Y           <- number  (coordY - 0.5 * rectangle.H)
+            svgRectangle.Width       <- number  (rectangle.W)
+            svgRectangle.Height      <- number  (rectangle.H)
+            svgRectangle.StrokeWidth <- number  (rectangle.StrokeWidth)
+            svgRectangle.Stroke      <- color   (rectangle.StrokeColor)
+            svgRectangle.Fill        <- color   (rectangle.FillColor)
             svgRectangle.FillOpacity <- float32 (rectangle.FillColor.A / 255)  
             svgRectangle.Transforms.Add (transform)
             doc.Children.Add (svgRectangle)

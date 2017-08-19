@@ -58,13 +58,13 @@ let drawInteractionRC (maxX, minY, maxY) (model) =
 
     let source = 
         [| (0.0, - 30.0); (10.0, - 20.0); (20.0, - 10.0); (30.0, 0.0); (40.0, 5.0); (50.0, 10.0); (60.0, 15.0); (65.0, 20.0);
-           (55.0, 40.0); (50.0, 55.0); (45.0, 65.0); (35.0, 70.0); (25.0, 75.0); (15.0, 80.0); (5.0, 85.0); (0.0, 90.0)|]
+           (60.0, 30.0); (55.0, 40.0); (50.0, 50.0); (40.0, 60.0); (30.0, 70.0); (20.0, 80.0); (10.0, 90.0); (0.0, 100.0) |]
     let pPoints =
         source
-        |> Array.map (fun (x, y) -> (orgCoordX + x * 1.5, orgCoordY - y * 1.5)) 
+        |> Array.map (fun (x, y) -> (orgCoordX + x * 1.5, orgCoordY - y)) 
     let nPoints = 
         source
-        |> Array.map (fun (x, y) -> (orgCoordX - x * 1.5, orgCoordY - y * 1.5)) 
+        |> Array.map (fun (x, y) -> (orgCoordX - x * 1.5, orgCoordY - y)) 
 
     [| 0 .. (pPoints.Length - 2) |]
     |> Array.map (fun index ->
@@ -110,16 +110,23 @@ let drawInteractionRC (maxX, minY, maxY) (model) =
     *)
 
 
+let drawTitle (x, y, title) (model) = 
+    model
+    |> Action.Move(x, y).On
+    |> Text.At (title, 0, 0)    
+    |> Attr.FontSize(16.0).With
             
 
 model
 |> drawAxis
-|> drawInteractionS (10, 10)
+|> drawInteractionS (6, 6)
+|> drawTitle (ox + 10, oy + range + 2, "Sの場合、圧縮・引張対称")
 |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\MNI_S.bmp"
 |> ignore
 
 model
 |> drawAxis
 |> drawInteractionRC (10, -4, 10)
+|> drawTitle (ox + 10, oy + range + 2, "RCの場合、圧縮側 > 引張側")
 |> SvgHelper.save @"C:\Users\So\Documents\Programs\other\kenchiku-thin-book\kenchiku-thin-book\md\html\image\MNI_RC.bmp"
 |> ignore
