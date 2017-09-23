@@ -10,6 +10,8 @@ type RCSection =
       CountOfBarX        : int 
       CountOfBarY        : int }
     with
+    member this.Width  = (this.CountOfBarX + 1) * 2
+    member this.Height = (this.CountOfBarY + 1) * 2
     member private this.BarCoordinates (ox : int, 
                                         oy : int, 
                                         width : int, 
@@ -40,8 +42,8 @@ type RCSection =
         
         let getSize (x) = (x + 1) * 2
         
-        let height =  getSize this.CountOfBarX
-        let width  =  getSize this.CountOfBarY
+        let height = this.Width 
+        let width  = this.Height
 
         let (ox, oy) = this.Position
         let barCoordinates = this.BarCoordinates (ox, oy, width, height)

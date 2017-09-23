@@ -55,6 +55,7 @@
     <None Include="MNInteraction.fsx" />
     <None Include="SlabLoad.fsx" />
     <None Include="RCSection.fsx" />
+    <None Include="RCSection_d_j.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SvgDrawer\SvgDrawer.fsproj">
